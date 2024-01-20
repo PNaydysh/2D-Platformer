@@ -14,6 +14,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private GameObject tp;
     [SerializeField] private Transform tpHolder;
+    [SerializeField] private bool tpThrown;
+
+    [SerializeField] private bool isWallSliding;
+    [SerializeField] private float wallSliddingSpeed = 2f;
+    [SerializeField] private LayerMask wallLayer;
+    [SerializeField] private Transform wallCheck;
 
     private int extraJumpCount = 0;
     private GameObject instantiatedTP;
@@ -25,7 +31,6 @@ public class PlayerController : MonoBehaviour
     private bool jumpControl;
     private int jumpIteration = 0;
     private int jumpValueIteration = 60;
-    [SerializeField] private bool tpThrown;
     private bool faceRight = true;
 
 
@@ -58,6 +63,7 @@ public class PlayerController : MonoBehaviour
         ExtraJump();
         Flip();
         ThrowTP();
+        WallSlide();
     }
 
     private void Jump()
@@ -138,6 +144,24 @@ public class PlayerController : MonoBehaviour
             transform.position = instantiatedTP.transform.transform.position;
             Destroy(instantiatedTP);
             tpThrown = false;
+        }
+    }
+
+    private bool IsWalled()
+    {
+        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+    }
+
+    private void WallSlide()
+    {
+        if (IsWalled() && !isGrounded)
+        {
+            isWallSliding = true;
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSliddingSpeed, float.MaxValue));
+        }
+        else
+        {
+            isWallSliding = false;
         }
     }
 }
