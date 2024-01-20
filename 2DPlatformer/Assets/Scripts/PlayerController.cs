@@ -10,14 +10,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float dashForce;
+    [SerializeField] private float extraJumpForce;
     [SerializeField] private LayerMask groundLayer;
 
     private Rigidbody2D rb;
     private Transform groundCheck;
     private bool isGrounded;
-    private int extraJumpCount = 0;
     private Vector2 moveDirection;
     private bool canDash = true;
+    private bool jumpControl;
+    private int jumpIteration = 0;
+    private int jumpValueIteration = 60;
 
 
     private void Start()
@@ -34,41 +37,71 @@ public class PlayerController : MonoBehaviour
 
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.01f, groundLayer);
+
+        Jump();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        Dash(moveDirection);
+        ExtraJump();
+    }
+
+    private void Jump()
+    {
+        if (Input.GetKey(KeyCode.Space))
         {
-            Dash(moveDirection);
+            if (isGrounded)
+            {
+                jumpControl = true;
+                canDash = true;
+            }
+        }
+        else
+        {
+            jumpControl = false;
         }
 
-        if (isGrounded)
+        if (jumpControl)
         {
-            extraJumpCount = 0;
-            canDash = true;
+            if (jumpIteration++ < jumpValueIteration)
+            {
+                rb.AddForce(Vector2.up * jumpForce / jumpIteration);
+            }
         }
-
-        if (extraJumpCount < 1 && Input.GetButtonDown("Jump"))
+        else
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            extraJumpCount++;
+            jumpIteration = 0;
         }
     }
+
+    private void ExtraJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (!isGrounded)
+            {
+                rb.AddForce(Vector2.up * extraJumpForce);
+            }
+        }
+    }
+
 
     private void Dash(Vector2 moveDirection)
     {
         if (!canDash)
             return;
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            if (rb.velocity.x >= 0)
+                rb.AddForce(Vector2.right * (dashForce));
 
-        if (rb.velocity.x >= 0)
-            rb.AddForce(Vector2.right * (dashForce * 100));
-
-        else
-            rb.AddForce(Vector2.left * (dashForce * 100));
+            else
+                rb.AddForce(Vector2.left * (dashForce));
 
 
-        if (!isGrounded)
-            canDash = false;
+            if (!isGrounded)
+                canDash = false;
+        }
     }
 }
