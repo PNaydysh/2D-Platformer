@@ -7,37 +7,46 @@ using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Movement forces")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float dashForce;
     [SerializeField] private float extraJumpForce;
-    [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private GameObject tp;
-    [SerializeField] private Transform tpHolder;
-    [SerializeField] private bool tpThrown;
+    [SerializeField] private float wallSliddingSpeed;
 
+    [Header("Ground check settings")]
+    [SerializeField] private bool isGrounded;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private Transform groundCheck;
+
+    [Header("Wall check settings")]
     [SerializeField] private bool isWallSliding;
-    [SerializeField] private float wallSliddingSpeed = 2f;
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private Transform wallCheck;
 
+    [Header("Teleport settings")]
+    [SerializeField] private bool tpThrown;
+    [SerializeField] private GameObject tp;
+    [SerializeField] private Transform tpHolder;
+
     private int extraJumpCount = 0;
-    private GameObject instantiatedTP;
-    private Rigidbody2D rb;
-    private Transform groundCheck;
-    private bool isGrounded;
-    private Vector2 moveDirection;
-    private bool canDash = true;
-    private bool jumpControl;
     private int jumpIteration = 0;
     private int jumpValueIteration = 60;
+
+    private bool canDash = true;
+    private bool jumpControl = true;
     private bool faceRight = true;
+
+    private GameObject instantiatedTP;
+
+    private Rigidbody2D rb;
+
+    private Vector2 moveDirection;
 
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        groundCheck = transform.Find("GroundCheck");
     }
 
     private void FixedUpdate()
@@ -64,6 +73,7 @@ public class PlayerController : MonoBehaviour
         Flip();
         ThrowTP();
         WallSlide();
+        WallJump();
     }
 
     private void Jump()
@@ -72,6 +82,11 @@ public class PlayerController : MonoBehaviour
         {
             if (isGrounded)
             {
+                jumpControl = true;
+            }
+            else if (IsWalled())
+            {
+                isWallSliding = false; 
                 jumpControl = true;
             }
         }
@@ -97,7 +112,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (!isGrounded && extraJumpCount++ < 1)
+            if (!isGrounded && !IsWalled() && extraJumpCount++ < 1)
             {
                 rb.AddForce(Vector2.up * extraJumpForce);
             }
@@ -161,6 +176,26 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            isWallSliding = false;
+        }
+    }
+
+    private void WallJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && IsWalled())
+        {
+            rb.velocity = new Vector2(rb.velocity.x, 0f);
+
+            if (faceRight)
+            {
+                rb.AddForce(new Vector2(-jumpForce, jumpForce));
+            }
+            else
+            {
+                rb.AddForce(new Vector2(jumpForce, jumpForce));
+            }
+
+            canDash = true;
             isWallSliding = false;
         }
     }
