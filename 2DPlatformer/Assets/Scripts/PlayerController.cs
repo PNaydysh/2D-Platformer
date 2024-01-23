@@ -114,7 +114,8 @@ public class PlayerController : MonoBehaviour
         {
             if (!isGrounded && !IsWalled() && extraJumpCount++ < 1)
             {
-                rb.AddForce(Vector2.up * extraJumpForce);
+                rb.velocity = new Vector2(rb.velocity.x, 0);
+                rb.AddForce(Vector2.up * extraJumpForce,ForceMode2D.Impulse);
             }
         }
     }

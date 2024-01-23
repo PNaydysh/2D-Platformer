@@ -379,9 +379,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
-  jumpForce: 200
+  jumpForce: 10
   dashForce: 8000
-  extraJumpForce: 500
+  extraJumpForce: 10
   wallSliddingSpeed: 2
   isGrounded: 0
   groundLayer:
