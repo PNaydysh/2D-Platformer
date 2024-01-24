@@ -7,25 +7,29 @@ using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement forces")]
-    [SerializeField] private float moveSpeed;
+    [Header("Movement forces")] [SerializeField]
+    private float moveSpeed;
+
     [SerializeField] private float jumpForce;
     [SerializeField] private float dashForce;
     [SerializeField] private float extraJumpForce;
     [SerializeField] private float wallSliddingSpeed;
 
-    [Header("Ground check settings")]
-    [SerializeField] private bool isGrounded;
+    [Header("Ground check settings")] [SerializeField]
+    private bool isGrounded;
+
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
 
-    [Header("Wall check settings")]
-    [SerializeField] private bool isWallSliding;
+    [Header("Wall check settings")] [SerializeField]
+    private bool isWallSliding;
+
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private Transform wallCheck;
 
-    [Header("Teleport settings")]
-    [SerializeField] private bool tpThrown;
+    [Header("Teleport settings")] [SerializeField]
+    private bool tpThrown;
+
     [SerializeField] private GameObject tp;
     [SerializeField] private Transform tpHolder;
 
@@ -74,6 +78,16 @@ public class PlayerController : MonoBehaviour
         ThrowTP();
         WallSlide();
         WallJump();
+        GetDown();
+    }
+
+    private void GetDown()
+    {
+        if (Input.GetKey(KeyCode.S))
+        {
+            Physics2D.IgnoreLayerCollision(9, 8, true);
+            Invoke("ActivateCollision", 0.5f);
+        }
     }
 
     private void Jump()
@@ -86,7 +100,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (IsWalled())
             {
-                isWallSliding = false; 
+                isWallSliding = false;
                 jumpControl = true;
             }
         }
@@ -115,7 +129,7 @@ public class PlayerController : MonoBehaviour
             if (!isGrounded && !IsWalled() && extraJumpCount++ < 1)
             {
                 rb.velocity = new Vector2(rb.velocity.x, 0);
-                rb.AddForce(Vector2.up * extraJumpForce,ForceMode2D.Impulse);
+                rb.AddForce(Vector2.up * extraJumpForce, ForceMode2D.Impulse);
             }
         }
     }
@@ -199,5 +213,10 @@ public class PlayerController : MonoBehaviour
             canDash = true;
             isWallSliding = false;
         }
+    }
+
+    private void ActivateCollision()
+    {
+        Physics2D.IgnoreLayerCollision(9, 8, false);
     }
 }
