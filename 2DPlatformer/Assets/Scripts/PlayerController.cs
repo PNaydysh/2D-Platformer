@@ -7,29 +7,25 @@ using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement forces")] [SerializeField]
-    private float moveSpeed;
-
+    [Header("Movement forces")] 
+    [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float dashForce;
     [SerializeField] private float extraJumpForce;
     [SerializeField] private float wallSliddingSpeed;
 
-    [Header("Ground check settings")] [SerializeField]
-    private bool isGrounded;
-
+    [Header("Ground check settings")] 
+    [SerializeField] private bool isGrounded;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
 
-    [Header("Wall check settings")] [SerializeField]
-    private bool isWallSliding;
-
+    [Header("Wall check settings")] 
+    [SerializeField] private bool isWallSliding;
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private Transform wallCheck;
 
-    [Header("Teleport settings")] [SerializeField]
-    private bool tpThrown;
-
+    [Header("Teleport settings")] 
+    [SerializeField] private bool tpThrown;
     [SerializeField] private GameObject tp;
     [SerializeField] private Transform tpHolder;
 
@@ -43,6 +39,8 @@ public class PlayerController : MonoBehaviour
 
     private GameObject instantiatedTP;
 
+    private Vector2 checkpointPosition;
+
     private Rigidbody2D rb;
 
     private Vector2 moveDirection;
@@ -51,6 +49,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        checkpointPosition = transform.position + new Vector3(0, 1, 0);
     }
 
     private void FixedUpdate()
@@ -133,7 +132,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
 
     private void Dash()
     {
@@ -218,5 +216,34 @@ public class PlayerController : MonoBehaviour
     private void ActivateCollision()
     {
         Physics2D.IgnoreLayerCollision(9, 8, false);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Obstacle"))
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        StartCoroutine(Respawn(0.5f));
+    }
+
+    IEnumerator Respawn(float duration)
+    {
+        rb.velocity = new Vector2(0, 0);
+        transform.localScale = new Vector3(0, 0, 0);
+        rb.simulated = false;
+        yield return new WaitForSeconds(duration);
+        transform.position = checkpointPosition;
+        transform.localScale = new Vector3(1, 2, 1);
+        rb.simulated = true;
+    }
+
+    public void UpdateCheckpointPosition(Vector2 pos)
+    {
+        checkpointPosition = pos + new Vector2(0, 1);
     }
 }
