@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject tp;
     [SerializeField] private Transform tpHolder;
 
-    private int extraJumpCount = 0;
+    [SerializeField] private int extraJumpCount = 0;
     private int jumpIteration = 0;
     private int jumpValueIteration = 60;
 
