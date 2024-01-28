@@ -7,25 +7,32 @@ using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement forces")] 
-    [SerializeField] private float moveSpeed;
+    [SerializeField] private GameObject menu;
+    private bool menuIsOpened = false;
+
+    [Header("Movement forces")] [SerializeField]
+    private float moveSpeed;
+
     [SerializeField] private float jumpForce;
     [SerializeField] private float dashForce;
     [SerializeField] private float extraJumpForce;
     [SerializeField] private float wallSliddingSpeed;
 
-    [Header("Ground check settings")] 
-    [SerializeField] private bool isGrounded;
+    [Header("Ground check settings")] [SerializeField]
+    private bool isGrounded;
+
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
 
-    [Header("Wall check settings")] 
-    [SerializeField] private bool isWallSliding;
+    [Header("Wall check settings")] [SerializeField]
+    private bool isWallSliding;
+
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private Transform wallCheck;
 
-    [Header("Teleport settings")] 
-    [SerializeField] private bool tpThrown;
+    [Header("Teleport settings")] [SerializeField]
+    private bool tpThrown;
+
     [SerializeField] private GameObject tp;
     [SerializeField] private Transform tpHolder;
 
@@ -78,6 +85,7 @@ public class PlayerController : MonoBehaviour
         WallSlide();
         WallJump();
         GetDown();
+        Menu();
     }
 
     private void GetDown()
@@ -245,5 +253,16 @@ public class PlayerController : MonoBehaviour
     public void UpdateCheckpointPosition(Vector2 pos)
     {
         checkpointPosition = pos + new Vector2(0, 1);
+    }
+
+    //меню, но, наверное, лучше его в другой скрипт вкинуть, но пока так
+    public void Menu()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Time.timeScale = menuIsOpened ? 1 : 0;
+            menuIsOpened = !menuIsOpened;
+            menu.SetActive(menuIsOpened);
+        }
     }
 }
